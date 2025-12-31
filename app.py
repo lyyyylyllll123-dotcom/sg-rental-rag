@@ -105,11 +105,11 @@ def handle_rag_query(question: str):
 # =========================================================
 # App Entry (NO UI LOGIC HERE)
 # =========================================================
-def main():
-    init_session_state()
-    load_knowledge_base()   # only sync status, no UI effect
-    render_app()            # ALL UI lives here
+# Initialize state
+init_session_state()
 
+# Load knowledge base (only sync status, no UI effect)
+load_knowledge_base()
 
-if __name__ == "__main__":
-    main()
+# Render UI (ALL UI lives in ui/layout.py)
+render_app()
