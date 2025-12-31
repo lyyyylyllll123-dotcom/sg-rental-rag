@@ -1,6 +1,6 @@
 """
-重排序模块
-使用 CrossEncoder 对检索结果进行重新排序
+Reranking Module
+Rerank retrieval results using CrossEncoder
 """
 from typing import List
 from langchain_core.documents import Document
@@ -8,14 +8,14 @@ from sentence_transformers import CrossEncoder
 
 
 class DocumentReranker:
-    """文档重排序器"""
+    """Document reranker"""
     
     def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
         """
-        初始化重排序模型
+        Initialize reranking model
         
         Args:
-            model_name: CrossEncoder 模型名称
+            model_name: CrossEncoder model name
         """
         self.reranker = CrossEncoder(model_name)
     
@@ -26,39 +26,39 @@ class DocumentReranker:
         top_k: int = 8
     ) -> List[Document]:
         """
-        对文档进行重排序
+        Rerank documents
         
         Args:
-            query: 用户问题
-            documents: 检索到的文档列表
-            top_k: 返回前 k 个文档
+            query: User question
+            documents: Retrieved document list
+            top_k: Return top k documents
         
         Returns:
-            重排序后的文档列表（按相关性从高到低）
+            Reranked document list (sorted by relevance from high to low)
         """
         if not documents:
             return []
         
-        # 限制文档长度，避免过长导致计算慢
+        # Limit document length to avoid slow computation due to excessive length
         pairs = [[query, doc.page_content[:500]] for doc in documents]
         
-        # 计算相关性分数
+        # Calculate relevance scores
         scores = self.reranker.predict(pairs)
         
-        # 按分数排序（从高到低）
+        # Sort by score (from high to low)
         scored_docs = list(zip(documents, scores))
         scored_docs.sort(key=lambda x: x[1], reverse=True)
         
-        # 返回 top_k
+        # Return top_k
         return [doc for doc, score in scored_docs[:top_k]]
 
 
-# 全局单例，避免重复加载模型
+# Global singleton to avoid reloading model
 _reranker_instance = None
 
 
 def get_reranker() -> DocumentReranker:
-    """获取重排序器单例"""
+    """Get reranker singleton"""
     global _reranker_instance
     if _reranker_instance is None:
         _reranker_instance = DocumentReranker()

@@ -1,6 +1,6 @@
 """
-网页内容加载模块
-使用 trafilatura 或 readability-lxml 提取网页正文
+Web Page Content Loader Module
+Extract web page content using trafilatura or readability-lxml
 """
 import requests
 from typing import Optional, Dict
@@ -25,27 +25,27 @@ from bs4 import BeautifulSoup
 
 def load_webpage(url: str, headers: Optional[Dict[str, str]] = None) -> Document:
     """
-    从 URL 加载网页内容并提取正文
+    Load web page content from URL and extract main text
     
     Args:
-        url: 网页 URL
-        headers: 请求头（可选，默认使用浏览器 User-Agent）
+        url: Web page URL
+        headers: Request headers (optional, default uses browser User-Agent)
     
     Returns:
-        LangChain Document 对象，包含：
-        - page_content: 提取的正文内容
+        LangChain Document object containing:
+        - page_content: Extracted main text content
         - metadata: {url, title, source, fetch_date}
     
     Raises:
-        Exception: 如果网页加载失败或内容提取失败
+        Exception: If web page loading fails or content extraction fails
     """
-    # 默认请求头（伪装成浏览器）
+    # Default request headers (pretend to be a browser)
     if headers is None:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
     
-    # 发送 HTTP 请求（带重试机制）
+    # Send HTTP request (with retry mechanism)
     max_retries = 3
     html_content = None
     
@@ -55,55 +55,55 @@ def load_webpage(url: str, headers: Optional[Dict[str, str]] = None) -> Document
                 url, 
                 headers=headers, 
                 timeout=30,
-                verify=True,  # 验证 SSL 证书
+                verify=True,  # Verify SSL certificate
                 allow_redirects=True,
             )
             response.raise_for_status()
             html_content = response.text
-            break  # 成功则退出循环
+            break  # Exit loop on success
         except requests.exceptions.SSLError as e:
             if attempt < max_retries - 1:
-                # 如果是最后一次尝试，尝试禁用 SSL 验证（不推荐，但作为备选）
+                # If this is the last attempt, try disabling SSL verification (not recommended, but as a fallback)
                 if attempt == max_retries - 1:
                     try:
                         response = requests.get(
                             url, 
                             headers=headers, 
                             timeout=30,
-                            verify=False,  # 最后一次尝试时禁用 SSL 验证
+                            verify=False,  # Disable SSL verification on last attempt
                             allow_redirects=True,
                         )
                         response.raise_for_status()
                         html_content = response.text
                         break
                     except Exception as e2:
-                        raise Exception(f"无法加载网页 {url} (SSL 错误，已重试 {max_retries} 次): {e2}")
+                        raise Exception(f"Failed to load web page {url} (SSL error, retried {max_retries} times): {e2}")
                 else:
-                    # 等待后重试
+                    # Wait before retrying
                     import time
-                    time.sleep(2 ** attempt)  # 指数退避：2秒、4秒
+                    time.sleep(2 ** attempt)  # Exponential backoff: 2s, 4s
                     continue
             else:
-                raise Exception(f"无法加载网页 {url} (SSL 错误，已重试 {max_retries} 次): {e}")
+                raise Exception(f"Failed to load web page {url} (SSL error, retried {max_retries} times): {e}")
         except Exception as e:
             if attempt < max_retries - 1:
                 import time
-                time.sleep(2 ** attempt)  # 指数退避
+                time.sleep(2 ** attempt)  # Exponential backoff
                 continue
             else:
-                raise Exception(f"无法加载网页 {url} (已重试 {max_retries} 次): {e}")
+                raise Exception(f"Failed to load web page {url} (retried {max_retries} times): {e}")
     
     if html_content is None:
-        raise Exception(f"无法加载网页 {url}")
+        raise Exception(f"Failed to load web page {url}")
     
-    # 提取正文内容（优先使用 trafilatura）
+    # Extract main text content (prefer trafilatura)
     text_content = None
     title = None
     
-    # 方法 1: 使用 trafilatura（推荐）
+    # Method 1: Use trafilatura (recommended)
     if TRAFILATURA_AVAILABLE:
         try:
-            # 使用 trafilatura 提取，配置为提取更多内容
+            # Use trafilatura to extract, configured to extract more content
             text_content = trafilatura.extract(
                 html_content,
                 include_comments=False,
@@ -112,14 +112,14 @@ def load_webpage(url: str, headers: Optional[Dict[str, str]] = None) -> Document
                 include_links=False,
             )
             if text_content:
-                # trafilatura 也可以提取标题
+                # trafilatura can also extract title
                 metadata_dict = trafilatura.extract_metadata(html_content)
                 if metadata_dict:
                     title = metadata_dict.get("title", "")
         except Exception:
             pass
     
-    # 方法 2: 使用 readability-lxml
+    # Method 2: Use readability-lxml
     if not text_content and READABILITY_AVAILABLE:
         try:
             doc = ReadabilityDocument(html_content)
@@ -128,20 +128,20 @@ def load_webpage(url: str, headers: Optional[Dict[str, str]] = None) -> Document
         except Exception:
             pass
     
-    # 方法 3: 使用 BeautifulSoup 作为后备
+    # Method 3: Use BeautifulSoup as fallback
     if not text_content:
         try:
             soup = BeautifulSoup(html_content, "lxml")
-            # 移除 script 和 style 标签
+            # Remove script and style tags
             for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
                 script.decompose()
             
-            # 提取标题
+            # Extract title
             title_tag = soup.find("title")
             if title_tag:
                 title = title_tag.get_text().strip()
             
-            # 提取正文（尝试多种选择器）
+            # Extract main text (try multiple selectors)
             main_content = None
             selectors = [
                 soup.find("main"),
@@ -154,14 +154,14 @@ def load_webpage(url: str, headers: Optional[Dict[str, str]] = None) -> Document
             for selector in selectors:
                 if selector:
                     text = selector.get_text(separator="\n", strip=True)
-                    if len(text) > 500:  # 确保内容足够长
+                    if len(text) > 500:  # Ensure content is long enough
                         main_content = selector
                         break
             
             if main_content:
                 text_content = main_content.get_text(separator="\n", strip=True)
             else:
-                # 如果找不到特定容器，使用 body
+                # If specific container not found, use body
                 body = soup.find("body")
                 if body:
                     text_content = body.get_text(separator="\n", strip=True)
@@ -169,20 +169,20 @@ def load_webpage(url: str, headers: Optional[Dict[str, str]] = None) -> Document
             pass
     
     if not text_content:
-        raise Exception(f"无法从网页 {url} 提取正文内容")
+        raise Exception(f"Failed to extract main text content from web page {url}")
     
-    # 清理文本
+    # Clean text
     text_content = text_content.strip()
     
-    # 如果没有提取到标题，使用 URL
+    # If title not extracted, use URL
     if not title:
         title = url.split("/")[-1] or url
     
-    # 提取域名作为 source
+    # Extract domain as source
     parsed_url = urlparse(url)
     source = parsed_url.netloc
     
-    # 创建 LangChain Document
+    # Create LangChain Document
     doc = Document(
         page_content=text_content,
         metadata={

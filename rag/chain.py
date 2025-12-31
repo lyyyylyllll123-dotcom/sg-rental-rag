@@ -1,7 +1,8 @@
 """
-RAG Chain 模块
-构建和运行 RAG 问答链
+RAG Chain Module
+Build and run RAG Q&A chain
 """
+import time
 from typing import Dict, List, Optional, Any
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.retrievers import BaseRetriever
@@ -20,36 +21,36 @@ def build_rag_chain(
     retriever: BaseRetriever,
 ) -> callable:
     """
-    构建 RAG 问答链（使用 LangChain LCEL 方式）
+    Build RAG Q&A chain (using LangChain LCEL)
     
     Args:
-        llm: LangChain ChatModel 实例
-        retriever: 检索器实例
+        llm: LangChain ChatModel instance
+        retriever: Retriever instance
     
     Returns:
-        可调用的 RAG 链函数，接受 {"question": str} 并返回回答
+        Callable RAG chain function that accepts {"question": str} and returns answer
     """
-    # 获取 Prompt 模板
+    # Get Prompt template
     prompt = get_rag_prompt()
     
-    # 格式化检索到的文档
+    # Format retrieved documents
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
     
-    # 使用 LangChain LCEL (LangChain Expression Language) 构建链
-    # 注意：需要正确处理输入格式
+    # Build chain using LangChain LCEL (LangChain Expression Language)
+    # Note: Need to properly handle input format
     def create_rag_input(input_dict):
-        """处理输入，确保格式正确"""
+        """Process input, ensure correct format"""
         question = input_dict.get("question", input_dict.get("input", ""))
         
-        # 第一步：初始检索（取更多候选文档）
+        # Step 1: Initial retrieval (get more candidate documents)
         initial_docs = retriever.invoke(question)
         
-        # 第二步：重排序（选择最相关的文档）
+        # Step 2: Rerank (select most relevant documents)
         reranker = get_reranker()
         reranked_docs = reranker.rerank(question, initial_docs, top_k=FINAL_RETRIEVAL_K)
         
-        # 第三步：格式化上下文
+        # Step 3: Format context
         context = format_docs(reranked_docs)
         return {
             "context": context,
@@ -72,45 +73,70 @@ def run_rag_query(
     retriever: BaseRetriever,
 ) -> Dict[str, Any]:
     """
-    运行 RAG 查询
+    Run RAG query
     
     Args:
-        question: 用户问题
-        llm: LangChain ChatModel 实例
-        retriever: 检索器实例
+        question: User question
+        llm: LangChain ChatModel instance
+        retriever: Retriever instance
     
     Returns:
-        包含以下字段的字典：
+        Dictionary containing the following fields:
         {
-            "answer": str,  # LLM 生成的回答
-            "citations": [  # 引用来源列表
+            "answer": str,  # LLM generated answer
+            "citations": [  # Citation source list
                 {
                     "title": str,
                     "url": str,
-                    "snippet": str,  # 相关文本片段
+                    "snippet": str,  # Relevant text snippet
                 }
             ]
         }
     """
-    # 构建 RAG 链
-    rag_chain = build_rag_chain(llm, retriever)
+    # PERFORM RETRIEVAL AND RERANKING ONLY ONCE (performance optimization)
+    start_time = time.time()
     
-    # 先检索文档（用于引用）
-    # 使用相同的重排序逻辑，确保引用和回答使用相同的文档
+    # Step 1: Initial retrieval (get more candidate documents)
+    retrieval_start = time.time()
     initial_docs = retriever.invoke(question)
+    retrieval_time = time.time() - retrieval_start
+    print(f"[Performance] Retrieval took {retrieval_time:.2f}s, retrieved {len(initial_docs)} docs")
+    
+    # Step 2: Rerank (select most relevant documents)
+    rerank_start = time.time()
     reranker = get_reranker()
     retrieved_docs = reranker.rerank(question, initial_docs, top_k=FINAL_RETRIEVAL_K)
+    rerank_time = time.time() - rerank_start
+    print(f"[Performance] Reranking took {rerank_time:.2f}s, selected {len(retrieved_docs)} docs")
     
-    # Execute query
+    # Step 3: Format context for LLM
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+    
+    context = format_docs(retrieved_docs)
+    
+    # Step 4: Build prompt and execute LLM query
+    prompt = get_rag_prompt()
+    
     try:
-        answer = rag_chain.invoke({"question": question})
+        # Format prompt with context and question
+        llm_start = time.time()
+        formatted_prompt = prompt.format_messages(context=context, question=question)
+        # Invoke LLM
+        response = llm.invoke(formatted_prompt)
+        answer = response.content if hasattr(response, 'content') else str(response)
+        llm_time = time.time() - llm_start
+        print(f"[Performance] LLM generation took {llm_time:.2f}s")
     except Exception as e:
-        # If RAG chain execution fails, return error message
+        # If LLM execution fails, return error message
         answer = f"Error generating answer: {e}"
         retrieved_docs = []
     
-    citations = []
+    total_time = time.time() - start_time
+    print(f"[Performance] Total query time: {total_time:.2f}s")
     
+    # Step 5: Build citations from retrieved documents
+    citations = []
     for doc in retrieved_docs:
         if isinstance(doc, Document):
             metadata = doc.metadata

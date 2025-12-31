@@ -1,6 +1,6 @@
 """
-RAG Retriever 模块
-负责从向量库中检索相关文档
+RAG Retriever Module
+Responsible for retrieving relevant documents from vector store
 """
 import os
 import traceback
@@ -11,22 +11,34 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.documents import Document
 
 
+# Global singleton for embeddings to avoid reloading
+_embeddings_instance = None
+_embeddings_model_name = None
+
 def get_embeddings(model_name: Optional[str] = None) -> HuggingFaceEmbeddings:
     """
-    获取 Embedding 模型实例
+    Get Embedding model instance (cached singleton)
     
     Args:
-        model_name: Embedding 模型名称（默认使用多语言模型）
+        model_name: Embedding model name (default uses multilingual model)
     
     Returns:
-        HuggingFaceEmbeddings 实例
+        HuggingFaceEmbeddings instance
     """
+    global _embeddings_instance, _embeddings_model_name
+    
     if model_name is None:
-        # 默认使用多语言模型，支持中英文
+        # Default to multilingual model, supports Chinese and English
         model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     
-    embeddings = HuggingFaceEmbeddings(model_name=model_name)
-    return embeddings
+    # Return cached instance if model name matches
+    if _embeddings_instance is not None and _embeddings_model_name == model_name:
+        return _embeddings_instance
+    
+    # Create new instance and cache it
+    _embeddings_instance = HuggingFaceEmbeddings(model_name=model_name)
+    _embeddings_model_name = model_name
+    return _embeddings_instance
 
 
 def load_vectorstore(
@@ -35,17 +47,17 @@ def load_vectorstore(
     embeddings: Optional[HuggingFaceEmbeddings] = None,
 ) -> Optional[FAISS]:
     """
-    加载已存在的向量库
+    Load existing vector store
     
     Args:
-        persist_directory: 向量库持久化目录
-        index_name: 索引名称（FAISS 使用文件名）
-        embeddings: Embedding 模型实例（如果为 None，将创建默认实例）
+        persist_directory: Vector store persistence directory
+        index_name: Index name (FAISS uses file name)
+        embeddings: Embedding model instance (if None, will create default instance)
     
     Returns:
-        FAISS 向量库实例，如果不存在则返回 None
+        FAISS vector store instance, returns None if it doesn't exist
     """
-    # FAISS 保存的文件是 .faiss 和 .pkl
+    # FAISS saves files as .faiss and .pkl
     faiss_path = os.path.join(persist_directory, f"{index_name}.faiss")
     pkl_path = os.path.join(persist_directory, f"{index_name}.pkl")
     
@@ -56,20 +68,20 @@ def load_vectorstore(
         embeddings = get_embeddings()
     
     try:
-        # FAISS.load_local 需要指定 index_name
+        # FAISS.load_local requires index_name to be specified
         vectorstore = FAISS.load_local(
             persist_directory,
             embeddings,
             allow_dangerous_deserialization=True,
             index_name=index_name,
         )
-        # 检查向量库是否为空
+        # Check if vector store is empty
         if vectorstore.index.ntotal == 0:
             return None
         return vectorstore
     except Exception as e:
-        # 打印错误信息以便调试
-        print(f"加载向量库失败: {e}")
+        # Print error message for debugging
+        print(f"Failed to load vector store: {e}")
         print(traceback.format_exc())
         return None
 
@@ -80,26 +92,26 @@ def create_retriever(
     search_type: str = "similarity",
 ) -> BaseRetriever:
     """
-    创建检索器
+    Create retriever
     
     Args:
-        vectorstore: FAISS 向量库实例
-        k: 检索的文档数量（top-k）
-        search_type: 检索类型（"similarity" 或 "mmr"）
+        vectorstore: FAISS vector store instance
+        k: Number of documents to retrieve (top-k)
+        search_type: Retrieval type ("similarity" or "mmr")
     
     Returns:
-        BaseRetriever 实例
+        BaseRetriever instance
     """
     search_kwargs = {"k": k}
     
     if search_type == "mmr":
-        # MMR (Maximum Marginal Relevance) 检索，平衡相关性和多样性
+        # MMR (Maximum Marginal Relevance) retrieval, balances relevance and diversity
         retriever = vectorstore.as_retriever(
             search_type="mmr",
             search_kwargs={"k": k, "fetch_k": k * 2},
         )
     else:
-        # 相似度检索
+        # Similarity retrieval
         retriever = vectorstore.as_retriever(
             search_type="similarity",
             search_kwargs=search_kwargs,

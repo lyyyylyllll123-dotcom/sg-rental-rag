@@ -1,17 +1,17 @@
 """
-DeepSeek LLM 封装模块
-使用 LangChain ChatModel 接口封装 DeepSeek API
+DeepSeek LLM Wrapper Module
+Wrap DeepSeek API using LangChain ChatModel interface
 """
 import os
 from typing import Optional
 from langchain_openai import ChatOpenAI
 from langchain_core.language_models.chat_models import BaseChatModel
 
-# 导入配置
+# Import configuration
 try:
     from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL
 except ImportError:
-    # 如果 config 模块不存在，使用环境变量
+    # If config module doesn't exist, use environment variables
     DEEPSEEK_API_KEY = None
     DEEPSEEK_BASE_URL = None
     DEEPSEEK_MODEL = None
@@ -25,32 +25,32 @@ def get_deepseek_llm(
     max_tokens: int = 2000,
 ) -> BaseChatModel:
     """
-    创建 DeepSeek LLM 实例
+    Create DeepSeek LLM instance
     
     Args:
-        api_key: DeepSeek API Key（优先使用参数，其次 config，最后环境变量）
-        base_url: API Base URL（优先使用参数，其次 config，最后环境变量）
-        model_name: 模型名称（优先使用参数，其次 config，最后环境变量）
-        temperature: 温度参数，默认 0.3（较低温度保证更准确的回答）
-        max_tokens: 最大生成 token 数，默认 2000
+        api_key: DeepSeek API Key (priority: parameter > config > environment variable)
+        base_url: API Base URL (priority: parameter > config > environment variable)
+        model_name: Model name (priority: parameter > config > environment variable)
+        temperature: Temperature parameter, default 0.3 (lower temperature ensures more accurate answers)
+        max_tokens: Maximum generated tokens, default 2000
     
     Returns:
-        LangChain ChatOpenAI 实例（配置为 DeepSeek API）
+        LangChain ChatOpenAI instance (configured for DeepSeek API)
     
     Raises:
-        ValueError: 如果 API Key 未配置
+        ValueError: If API Key is not configured
     """
-    # 优先级：参数 > config 模块 > 环境变量 > 默认值
+    # Priority: parameter > config module > environment variable > default value
     api_key = api_key or DEEPSEEK_API_KEY or os.getenv("OPENAI_API_KEY")
     base_url = base_url or DEEPSEEK_BASE_URL or os.getenv("OPENAI_BASE_URL", "https://api.deepseek.com/v1")
     model_name = model_name or DEEPSEEK_MODEL or os.getenv("MODEL_NAME", "deepseek-chat")
     
     if not api_key:
         raise ValueError(
-            "DeepSeek API Key 未配置。请设置环境变量 OPENAI_API_KEY 或在调用时传入 api_key 参数。"
+            "DeepSeek API Key is not configured. Please set the OPENAI_API_KEY environment variable or pass the api_key parameter when calling."
         )
     
-    # 创建 ChatOpenAI 实例，配置为 DeepSeek API
+    # Create ChatOpenAI instance, configured for DeepSeek API
     llm = ChatOpenAI(
         model=model_name,
         openai_api_key=api_key,
