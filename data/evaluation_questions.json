@@ -1,0 +1,257 @@
+[
+  {
+    "question": "持有 Student Pass 的学生可以租 HDB 吗？",
+    "category": "eligibility",
+    "expected_keywords": ["Student Pass", "HDB", "eligible", "rent"]
+  },
+  {
+    "question": "HDB 的最短租期是多少个月？",
+    "category": "rules",
+    "expected_keywords": ["minimum", "lease", "months", "HDB"]
+  },
+  {
+    "question": "私人住宅的最短租期要求是什么？",
+    "category": "rules",
+    "expected_keywords": ["private", "residential", "minimum", "lease"]
+  },
+  {
+    "question": "租房流程包括哪些步骤？",
+    "category": "process",
+    "expected_keywords": ["steps", "process", "application", "contract"]
+  },
+  {
+    "question": "EP 持有者可以租整套 HDB 吗？",
+    "category": "eligibility",
+    "expected_keywords": ["EP", "Employment Pass", "HDB", "entire flat"]
+  },
+  {
+    "question": "租房需要支付哪些押金？",
+    "category": "process",
+    "expected_keywords": ["deposit", "security", "rental"]
+  },
+  {
+    "question": "违规出租会有什么后果？",
+    "category": "risks",
+    "expected_keywords": ["penalty", "violation", "consequences", "illegal"]
+  },
+  {
+    "question": "LTVP 持有者可以租房间吗？",
+    "category": "eligibility",
+    "expected_keywords": ["LTVP", "room", "rent"]
+  },
+  {
+    "question": "HDB 和私人住宅的租赁规则有什么区别？",
+    "category": "rules",
+    "expected_keywords": ["HDB", "private", "difference", "rules"]
+  },
+  {
+    "question": "租房合同需要注意哪些事项？",
+    "category": "process",
+    "expected_keywords": ["contract", "agreement", "terms", "conditions"]
+  },
+  {
+    "question": "如何续租 HDB 单位？",
+    "category": "process",
+    "expected_keywords": ["renewal", "tenancy", "HDB", "extend"]
+  },
+  {
+    "question": "公共租赁计划的申请资格是什么？",
+    "category": "eligibility",
+    "expected_keywords": ["public rental", "scheme", "eligibility", "qualify"]
+  },
+  {
+    "question": "HDB 租房的人数限制是多少？",
+    "category": "rules",
+    "expected_keywords": ["occupancy", "limit", "people", "HDB"]
+  },
+  {
+    "question": "如何检查房产中介是否注册？",
+    "category": "process",
+    "expected_keywords": ["agent", "registered", "check", "CEA"]
+  },
+  {
+    "question": "租房诈骗有哪些常见类型？",
+    "category": "risks",
+    "expected_keywords": ["scam", "fraud", "rental", "warning"]
+  },
+  {
+    "question": "自己租房 HDB 需要注意什么？",
+    "category": "process",
+    "expected_keywords": ["transacting", "own", "HDB", "renting"]
+  },
+  {
+    "question": "租房纠纷如何解决？",
+    "category": "risks",
+    "expected_keywords": ["dispute", "resolution", "conflict", "CEA"]
+  },
+  {
+    "question": "CEA 对租房有什么规定？",
+    "category": "rules",
+    "expected_keywords": ["CEA", "regulations", "rental", "rules"]
+  },
+  {
+    "question": "HDB 租房的租金和押金是多少？",
+    "category": "process",
+    "expected_keywords": ["rent", "deposit", "public rental", "amount"]
+  },
+  {
+    "question": "如何申请公共租赁计划？",
+    "category": "process",
+    "expected_keywords": ["application", "public rental", "apply", "HDB"]
+  },
+  {
+    "question": "公共租赁计划的房屋类型有哪些？",
+    "category": "rules",
+    "expected_keywords": ["flat types", "public rental", "housing", "options"]
+  },
+  {
+    "question": "可以更改公共租赁的租户吗？",
+    "category": "process",
+    "expected_keywords": ["change", "tenancy", "occupier", "transfer"]
+  },
+  {
+    "question": "如何终止 HDB 租约？",
+    "category": "process",
+    "expected_keywords": ["terminate", "tenancy", "cancel", "HDB"]
+  },
+  {
+    "question": "公共租赁的租金援助计划是什么？",
+    "category": "process",
+    "expected_keywords": ["rental assistance", "subsidy", "support", "financial"]
+  },
+  {
+    "question": "HDB 租房的付款和滞纳金规定是什么？",
+    "category": "rules",
+    "expected_keywords": ["payment", "late charges", "penalty", "rent"]
+  },
+  {
+    "question": "可以转让公共租赁单位吗？",
+    "category": "process",
+    "expected_keywords": ["transfer", "rental flat", "another", "HDB"]
+  },
+  {
+    "question": "公开市场租房的资格要求是什么？",
+    "category": "eligibility",
+    "expected_keywords": ["open market", "eligibility", "rent", "HDB"]
+  },
+  {
+    "question": "出租 HDB 单位需要遵守哪些规定？",
+    "category": "rules",
+    "expected_keywords": ["renting out", "regulations", "HDB", "rules"]
+  },
+  {
+    "question": "HDB 出租的统计信息在哪里查看？",
+    "category": "rules",
+    "expected_keywords": ["statistics", "rental", "data", "HDB"]
+  },
+  {
+    "question": "聘请房产中介时需要注意什么？",
+    "category": "process",
+    "expected_keywords": ["property agent", "engaging", "note", "CEA"]
+  },
+  {
+    "question": "房产中介的职责是什么？",
+    "category": "process",
+    "expected_keywords": ["agent", "duties", "responsibilities", "CEA"]
+  },
+  {
+    "question": "自己买卖 HDB 单位需要注意什么？",
+    "category": "process",
+    "expected_keywords": ["buying", "selling", "HDB", "transacting"]
+  },
+  {
+    "question": "自己出租私人住宅需要注意什么？",
+    "category": "process",
+    "expected_keywords": ["private property", "renting out", "transacting", "own"]
+  },
+  {
+    "question": "URA 对私人住宅租赁有什么规定？",
+    "category": "rules",
+    "expected_keywords": ["URA", "private residential", "rental", "guidelines"]
+  },
+  {
+    "question": "短期住宿（少于3个月）有什么限制？",
+    "category": "rules",
+    "expected_keywords": ["short-term", "accommodation", "URA", "restrictions"]
+  },
+  {
+    "question": "出租 HDB 单位作为房主的指南是什么？",
+    "category": "process",
+    "expected_keywords": ["homeowner", "guide", "renting out", "HDB"]
+  },
+  {
+    "question": "如何支持和帮助公共租赁家庭？",
+    "category": "process",
+    "expected_keywords": ["support", "public rental", "households", "assistance"]
+  },
+  {
+    "question": "外国人可以租 HDB 吗？",
+    "category": "eligibility",
+    "expected_keywords": ["foreigner", "HDB", "rent", "eligible"]
+  },
+  {
+    "question": "工作准证持有者可以租整套 HDB 吗？",
+    "category": "eligibility",
+    "expected_keywords": ["work permit", "HDB", "entire flat", "eligible"]
+  },
+  {
+    "question": "HDB 房间出租和整套出租的规则有什么不同？",
+    "category": "rules",
+    "expected_keywords": ["room", "entire flat", "difference", "HDB"]
+  },
+  {
+    "question": "私人住宅的租期可以少于6个月吗？",
+    "category": "rules",
+    "expected_keywords": ["private", "lease", "minimum", "months"]
+  },
+  {
+    "question": "租房时需要检查哪些文件？",
+    "category": "process",
+    "expected_keywords": ["documents", "check", "renting", "verify"]
+  },
+  {
+    "question": "租房押金什么时候可以退还？",
+    "category": "process",
+    "expected_keywords": ["deposit", "refund", "return", "when"]
+  },
+  {
+    "question": "如果房东违约怎么办？",
+    "category": "risks",
+    "expected_keywords": ["landlord", "breach", "violation", "dispute"]
+  },
+  {
+    "question": "如果租客违约怎么办？",
+    "category": "risks",
+    "expected_keywords": ["tenant", "breach", "violation", "consequences"]
+  },
+  {
+    "question": "HDB 出租需要向 HDB 报告吗？",
+    "category": "rules",
+    "expected_keywords": ["report", "notify", "HDB", "renting out"]
+  },
+  {
+    "question": "可以转租 HDB 单位吗？",
+    "category": "rules",
+    "expected_keywords": ["sublet", "sublease", "HDB", "allowed"]
+  },
+  {
+    "question": "租房时如何避免诈骗？",
+    "category": "risks",
+    "expected_keywords": ["avoid", "scam", "fraud", "protection"]
+  },
+  {
+    "question": "CEA 的监管事项包括什么？",
+    "category": "rules",
+    "expected_keywords": ["regulatory", "matters", "CEA", "oversight"]
+  },
+  {
+    "question": "公共租赁计划的申请和选择流程是什么？",
+    "category": "process",
+    "expected_keywords": ["application", "selection", "public rental", "process"]
+  },
+  {
+    "question": "可以更改或取消公共租赁申请吗？",
+    "category": "process",
+    "expected_keywords": ["change", "cancellation", "application", "public rental"]
+  }
+]
