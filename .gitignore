@@ -21,10 +21,10 @@ ENV/
 Thumbs.db
 
 # 项目特定
-data/faiss/
+# data/faiss/  # Commented out to allow FAISS files in GitHub for Streamlit Cloud
 *.log
-*.pkl
-*.faiss
+# *.pkl  # Commented out to allow FAISS .pkl files
+# *.faiss  # Commented out to allow FAISS .faiss files
 
 # 环境变量
 .env

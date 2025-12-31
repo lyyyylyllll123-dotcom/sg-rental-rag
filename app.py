@@ -63,8 +63,13 @@ def load_knowledge_base():
             except Exception:
                 st.session_state.kb_blocks_count = 0
             return vectorstore
-    except Exception:
-        pass
+    except Exception as e:
+        # Log error for debugging (visible in Streamlit Cloud logs)
+        import traceback
+        error_msg = f"Failed to load knowledge base: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)
+        # Store error message in session state for UI display
+        st.session_state.kb_load_error = str(e)
 
     st.session_state.kb_loaded = False
     st.session_state.kb_blocks_count = 0

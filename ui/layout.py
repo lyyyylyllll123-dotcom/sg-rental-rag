@@ -36,6 +36,12 @@ def render_app():
             st.success(f"✅ Loaded ({kb_blocks_count} blocks)")
         else:
             st.error("❌ Not loaded")
+            # Show error message if available
+            kb_error = st.session_state.get("kb_load_error")
+            if kb_error:
+                st.caption(f"Error: {kb_error}")
+            else:
+                st.caption("Make sure data/faiss/ files are uploaded to GitHub")
         
         st.divider()
         

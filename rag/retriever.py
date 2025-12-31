@@ -62,6 +62,14 @@ def load_vectorstore(
     pkl_path = os.path.join(persist_directory, f"{index_name}.pkl")
     
     if not os.path.exists(faiss_path) or not os.path.exists(pkl_path):
+        missing_files = []
+        if not os.path.exists(faiss_path):
+            missing_files.append(faiss_path)
+        if not os.path.exists(pkl_path):
+            missing_files.append(pkl_path)
+        print(f"FAISS files not found: {missing_files}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Looking in: {persist_directory}")
         return None
     
     if embeddings is None:
